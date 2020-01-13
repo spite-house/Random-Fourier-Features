@@ -59,52 +59,6 @@ def rescale_data(data):
     features = np.concatenate(features_list, axis = 1)
     return features, targets
     
-        
-
-# trains weights and outputs a nx2 matrix where n is number of features
-# weights[i, j] = conditional probability of i given score j
-def naive_bayes(dataN, dataP):
-    condP = np.zeros([len(dataP[0]), 2])
-    # compute probability of each feature with laplace smoothing
-    for i in range(len(condP)):
-        totalN = 0
-        totalP = 0
-        for entry in dataN:
-            totalN += entry[i]
-        for entry in dataP:
-            totalP += entry[i]
-        condP[i, 0] = (totalN + 1) / (len(dataN) + 2)
-        condP[i, 1] = (totalP + 1) / (len(dataP) + 2)
-    return condP
-
-# uses conditional probability weights and computes predictions
-def check(data, weights, score):
-    inclusionmat = np.ones([len(data), len(data[0])])
-    nhasx = np.log(weights[:, 0] / weights[:, 1])
-    phasx = np.log(weights[:, 1] / weights[:, 0])
-    nnox = np.log((1 - weights[:, 0]) / (1 - weights[:, 1]))
-    pnox = np.log((1 - weights[:, 1]) / (1 - weights[:, 0]))
-    probN = np.matmul(inclusionmat, nnox) + np.matmul(data, nhasx - nnox)
-    probP = np.matmul(inclusionmat, pnox) + np.matmul(data, phasx - pnox)
-    predictions = probP - probN
-    for i in range(len(predictions)):
-        if predictions[i] < 0:
-            predictions[i] = 1 - score
-        else:
-            predictions[i] = score
-    return np.sum(predictions) / len(predictions)
-
-def process_bayes(data, key_list):
-    features_list = list()
-    m = len(key_list[0])
-    for i in range(len(key_list)):
-        #Manually removing variables
-        if not i in [2, 10, 11]:
-            vector = trait_vector(data, i)
-            if not key_list[i] == "continuous":
-                features_list.append(make_rep(vector, key_list[i]))
-            features = np.concatenate(features_list, axis = 1)
-    return features
 
 def split_cases(x, y):
     neg = list()
